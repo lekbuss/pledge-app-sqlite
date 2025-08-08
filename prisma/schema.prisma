@@ -1,0 +1,71 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum CommitmentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CHARGED
+}
+
+enum VerifyMode {
+  NEEDS_CONFIRM
+  AUTO_PASS
+  AUTO_FAIL
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String?
+  createdAt    DateTime      @default(now())
+  commitments  Commitment[]
+  supervisings Supervision[] @relation("Supervisor")
+}
+
+model Commitment {
+  id            String            @id @default(cuid())
+  userId        String
+  user          User              @relation(fields: [userId], references: [id])
+  title         String
+  description   String
+  amountCents   Int
+  currency      String
+  deadline      DateTime
+  evidenceUrl   String?
+  status        CommitmentStatus  @default(PENDING)
+  supervisor    Supervision?
+  stripePmToken String?
+  auditLogs     AuditLog[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model Supervision {
+  id              String       @id @default(cuid())
+  commitmentId    String       @unique
+  commitment      Commitment   @relation(fields: [commitmentId], references: [id])
+  supervisorId    String?
+  supervisor      User?        @relation("Supervisor", fields: [supervisorId], references: [id])
+  supervisorEmail String
+  connectAccount  String?
+  verifyMode      VerifyMode   @default(NEEDS_CONFIRM)
+  verifyToken     String
+  verifiedAt      DateTime?
+}
+
+model AuditLog {
+  id            String    @id @default(cuid())
+  commitmentId  String
+  commitment    Commitment @relation(fields: [commitmentId], references: [id])
+  event         String
+  data          Json?
+  createdAt     DateTime  @default(now())
+}
