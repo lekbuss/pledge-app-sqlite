@@ -1,5 +1,5 @@
 # Pledge App (MVP) — Fail → Auto Charge to Supervisor
-
+test
 This is a minimal **Next.js 14 (App Router, TypeScript)** + **Prisma (PostgreSQL)** + **Stripe (SetupIntent + PaymentIntent + Connect)** MVP.
 Users create a pledge (amount, deadline, supervisor). On deadline:
 - If success (user uploads evidence & supervisor confirms): **no charge**.
